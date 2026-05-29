@@ -1,146 +1,320 @@
-const ubicaciones = [
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-  // =========================
-  // SAN ANTONIO - BDP
-  // =========================
+  <title>Mapa Logístico Paraguay - BDP</title>
 
-  {
-    nombre: "Bebidas del Paraguay",
-    tipo: "Centro Logístico y Centro de Distribución",
-    ciudad: "San Antonio",
-    lat: -25.429444,
-    lng: -57.538611,
-    icono: iconoCD
-  },
+  <!-- LEAFLET -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
 
-  // =========================
-  // PEPSI
-  // =========================
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  {
-    nombre: "Pepsi",
-    tipo: "Centro Logístico",
-    ciudad: "San Antonio",
-    lat: -25.44268083337986,
-    lng: -57.53702555583515,
-    icono: iconoLogistico
-  },
+  <style>
 
-  // =========================
-  // PROVEO
-  // =========================
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family: Arial, sans-serif;
+    }
 
-  {
-    nombre: "PROVEO",
-    tipo: "Centro de Distribución",
-    ciudad: "San Antonio",
-    lat: -25.456193971577502,
-    lng: -57.51920067823696,
-    icono: iconoCD
-  },
+    body{
+      background:#f2f2f2;
+    }
 
-  // =========================
-  // GUARAMBARÉ
-  // =========================
+    .header{
+      background:#1f4d36;
+      color:white;
+      padding:18px 25px;
+      font-size:24px;
+      font-weight:bold;
+      box-shadow:0 2px 8px rgba(0,0,0,0.2);
+      z-index:999;
+      position:relative;
+    }
 
-  {
-    nombre: "Guarambaré",
-    tipo: "Centro de Distribución",
-    ciudad: "Guarambaré",
-    lat: -25.501599087035984,
-    lng: -57.46326180265211,
-    icono: iconoCD
-  },
+    #map{
+      width:100%;
+      height:92vh;
+    }
 
-  // =========================
-  // MISIONES
-  // =========================
+    .popup-title{
+      font-size:18px;
+      font-weight:bold;
+      color:#1f4d36;
+      margin-bottom:8px;
+    }
 
-  {
-    nombre: "Misiones",
-    tipo: "Centro de Distribución",
-    ciudad: "Misiones",
-    lat: -26.88382012041702,
-    lng: -57.02199984710737,
-    icono: iconoCD
-  },
+    .popup-info{
+      font-size:14px;
+      line-height:1.6;
+    }
 
-  // =========================
-  // ENCARNACIÓN
-  // =========================
+    .legend {
+      background: white;
+      padding: 12px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      line-height: 1.8;
+    }
 
-  {
-    nombre: "Encarnación",
-    tipo: "Centro Logístico y Centro de Distribución",
-    ciudad: "Encarnación",
-    lat: -27.29260658723391,
-    lng: -55.93067365752728,
-    icono: iconoLogistico
-  },
+    .legend h4{
+      margin-bottom:10px;
+      color:#1f4d36;
+    }
 
-  // =========================
-  // MARÍA AUXILIADORA
-  // =========================
+    .legend-item{
+      display:flex;
+      align-items:center;
+      margin-bottom:8px;
+    }
 
-  {
-    nombre: "María Auxiliadora",
-    tipo: "Centro de Distribución",
-    ciudad: "María Auxiliadora",
-    lat: -26.518667,
-    lng: -55.269222,
-    icono: iconoCD
-  },
+    .legend img{
+      width:24px;
+      margin-right:10px;
+    }
 
-  // =========================
-  // CORONEL OVIEDO
-  // =========================
+  </style>
+</head>
 
-  {
-    nombre: "Coronel Oviedo",
-    tipo: "Centro Logístico y Centro de Distribución",
-    ciudad: "Coronel Oviedo",
-    lat: -25.46656444531854,
-    lng: -56.45207143477352,
-    icono: iconoLogistico
-  },
+<body>
 
-  // =========================
-  // CIUDAD DEL ESTE
-  // =========================
+  <div class="header">
+    Mapa de Centros Logísticos y Distribución - Bebidas del Paraguay
+  </div>
 
-  {
-    nombre: "Ciudad del Este",
-    tipo: "Centro Logístico y Centro de Distribución",
-    ciudad: "Ciudad del Este",
-    lat: -25.484795967581473,
-    lng: -54.68222564220795,
-    icono: iconoLogistico
-  },
+  <div id="map"></div>
 
-  // =========================
-  // KATUETÉ
-  // =========================
+  <script>
 
-  {
-    nombre: "Katueté",
-    tipo: "Centro de Distribución",
-    ciudad: "Katueté",
-    lat: -24.253200915745353,
-    lng: -54.769266237236444,
-    icono: iconoCD
-  },
+    // ==========================================
+    // CREAR MAPA
+    // ==========================================
 
-  // =========================
-  // LIBERACIÓN
-  // =========================
+    const map = L.map('map', {
+      zoomControl: true,
+      minZoom: 6,
+      maxZoom: 10
+    }).setView([-24.7, -57.5], 6);
 
-  {
-    nombre: "Liberación",
-    tipo: "Centro de Distribución",
-    ciudad: "Liberación",
-    lat: -24.191830382502708,
-    lng: -56.442104433951044,
-    icono: iconoCD
-  }
+    // ==========================================
+    // LIMITAR MAPA A PARAGUAY
+    // ==========================================
 
-];
+    const bounds = [
+      [-27.8, -63.0],
+      [-19.0, -53.0]
+    ];
+
+    map.setMaxBounds(bounds);
+
+    // ==========================================
+    // MAPA BASE
+    // ==========================================
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
+
+    // ==========================================
+    // ICONOS PERSONALIZADOS
+    // ==========================================
+
+    const iconoCD = L.icon({
+      iconUrl: 'cd.png',
+      iconSize: [52, 52],
+      iconAnchor: [26, 52],
+      popupAnchor: [0, -45]
+    });
+
+    const iconoLogistico = L.icon({
+      iconUrl: 'cl.png',
+      iconSize: [52, 52],
+      iconAnchor: [26, 52],
+      popupAnchor: [0, -45]
+    });
+
+    // ==========================================
+    // UBICACIONES
+    // ==========================================
+
+    const ubicaciones = [
+
+      // SAN ANTONIO - BDP
+      {
+        nombre: "Bebidas del Paraguay",
+        tipo: "Centro Logístico y Centro de Distribución",
+        ciudad: "San Antonio",
+        lat: -25.429444,
+        lng: -57.538611,
+        icono: iconoCD
+      },
+
+      // PEPSI
+      {
+        nombre: "Pepsi",
+        tipo: "Centro Logístico",
+        ciudad: "San Antonio",
+        lat: -25.44268083337986,
+        lng: -57.53702555583515,
+        icono: iconoLogistico
+      },
+
+      // PROVEO
+      {
+        nombre: "PROVEO",
+        tipo: "Centro de Distribución",
+        ciudad: "San Antonio",
+        lat: -25.456193971577502,
+        lng: -57.51920067823696,
+        icono: iconoCD
+      },
+
+      // GUARAMBARÉ
+      {
+        nombre: "Guarambaré",
+        tipo: "Centro de Distribución",
+        ciudad: "Guarambaré",
+        lat: -25.501599087035984,
+        lng: -57.46326180265211,
+        icono: iconoCD
+      },
+
+      // MISIONES
+      {
+        nombre: "Misiones",
+        tipo: "Centro de Distribución",
+        ciudad: "Misiones",
+        lat: -26.88382012041702,
+        lng: -57.02199984710737,
+        icono: iconoCD
+      },
+
+      // ENCARNACIÓN
+      {
+        nombre: "Encarnación",
+        tipo: "Centro Logístico y Centro de Distribución",
+        ciudad: "Encarnación",
+        lat: -27.29260658723391,
+        lng: -55.93067365752728,
+        icono: iconoLogistico
+      },
+
+      // MARÍA AUXILIADORA
+      {
+        nombre: "María Auxiliadora",
+        tipo: "Centro de Distribución",
+        ciudad: "María Auxiliadora",
+        lat: -26.518667,
+        lng: -55.269222,
+        icono: iconoCD
+      },
+
+      // CORONEL OVIEDO
+      {
+        nombre: "Coronel Oviedo",
+        tipo: "Centro Logístico y Centro de Distribución",
+        ciudad: "Coronel Oviedo",
+        lat: -25.46656444531854,
+        lng: -56.45207143477352,
+        icono: iconoLogistico
+      },
+
+      // CIUDAD DEL ESTE
+      {
+        nombre: "Ciudad del Este",
+        tipo: "Centro Logístico y Centro de Distribución",
+        ciudad: "Ciudad del Este",
+        lat: -25.484795967581473,
+        lng: -54.68222564220795,
+        icono: iconoLogistico
+      },
+
+      // KATUETÉ
+      {
+        nombre: "Katueté",
+        tipo: "Centro de Distribución",
+        ciudad: "Katueté",
+        lat: -24.253200915745353,
+        lng: -54.769266237236444,
+        icono: iconoCD
+      },
+
+      // LIBERACIÓN
+      {
+        nombre: "Liberación",
+        tipo: "Centro de Distribución",
+        ciudad: "Liberación",
+        lat: -24.191830382502708,
+        lng: -56.442104433951044,
+        icono: iconoCD
+      }
+
+    ];
+
+    // ==========================================
+    // AGREGAR MARCADORES
+    // ==========================================
+
+    ubicaciones.forEach(punto => {
+
+      const marker = L.marker(
+        [punto.lat, punto.lng],
+        { icon: punto.icono }
+      ).addTo(map);
+
+      marker.bindPopup(`
+
+        <div class="popup-title">
+          ${punto.ciudad}
+        </div>
+
+        <div class="popup-info">
+          <b>Ubicación:</b> ${punto.nombre}<br>
+          <b>Tipo:</b> ${punto.tipo}
+        </div>
+
+      `);
+
+    });
+
+    // ==========================================
+    // LEYENDA
+    // ==========================================
+
+    const legend = L.control({ position: "bottomright" });
+
+    legend.onAdd = function () {
+
+      const div = L.DomUtil.create("div", "legend");
+
+      div.innerHTML = `
+
+        <h4>Leyenda</h4>
+
+        <div class="legend-item">
+          <img src="cd.png">
+          Centro de Distribución
+        </div>
+
+        <div class="legend-item">
+          <img src="cl.png">
+          Centro Logístico
+        </div>
+
+      `;
+
+      return div;
+    };
+
+    legend.addTo(map);
+
+  </script>
+
+</body>
+</html>
