@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Mapa Logístico Paraguay</title>
 
-  <!-- Leaflet -->
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -14,6 +13,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <style>
+
     *{
       margin:0;
       padding:0;
@@ -26,54 +26,50 @@
     }
 
     .header{
-      background:#003366;
+      background:#002b5c;
       color:white;
-      padding:15px 20px;
-      font-size:22px;
+      padding:16px 24px;
+      font-size:24px;
       font-weight:bold;
       box-shadow:0 2px 8px rgba(0,0,0,0.2);
     }
 
     #map{
       width:100%;
-      height:90vh;
+      height:92vh;
     }
 
     .popup-title{
       font-size:18px;
       font-weight:bold;
+      color:#002b5c;
       margin-bottom:8px;
-      color:#003366;
     }
 
     .popup-info{
       font-size:14px;
-      line-height:1.5;
+      line-height:1.6;
     }
 
     .legend {
       background: white;
       padding: 12px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.25);
       line-height: 1.8;
     }
 
     .legend h4{
       margin-bottom:8px;
-      color:#003366;
+      color:#002b5c;
     }
 
-    .legend span{
-      font-size:18px;
-      margin-right:8px;
-    }
   </style>
 </head>
 <body>
 
   <div class="header">
-    Mapa de Centros Logísticos - Paraguay
+    Mapa de Centros Logísticos y Distribución - Paraguay
   </div>
 
   <div id="map"></div>
@@ -81,18 +77,33 @@
   <script>
 
     // =========================
-    // CREAR MAPA
+    // MAPA PARAGUAY
     // =========================
 
-    const map = L.map('map').setView([-23.4425, -58.4438], 6);
+    const map = L.map('map', {
+      zoomControl: true,
+      minZoom: 6,
+      maxZoom: 10
+    }).setView([-23.4, -58.4], 6);
 
+    // Limitar navegación a Paraguay
+    const bounds = [
+      [-27.7, -62.8],
+      [-19.0, -53.0]
+    ];
+
+    map.setMaxBounds(bounds);
+
+    // =========================
     // MAPA BASE
+    // =========================
+
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap'
     }).addTo(map);
 
     // =========================
-    // ICONOS PERSONALIZADOS
+    // ICONOS
     // =========================
 
     function crearIcono(color) {
@@ -100,21 +111,20 @@
         html: `
           <div style="
             background:${color};
-            width:22px;
-            height:22px;
+            width:24px;
+            height:24px;
             border-radius:50%;
-            border:3px solid white;
+            border:4px solid white;
             box-shadow:0 0 10px rgba(0,0,0,0.4);
           "></div>
         `,
         className: "",
-        iconSize: [22,22]
+        iconSize: [24,24]
       });
     }
 
     const iconoCD = crearIcono("#007bff");
     const iconoLogistico = crearIcono("#28a745");
-    const iconoFrio = crearIcono("#00c2ff");
 
     // =========================
     // UBICACIONES
@@ -122,40 +132,99 @@
 
     const ubicaciones = [
 
+      // SAN ANTONIO
       {
-        nombre: "CD Asunción",
-        tipo: "Centro de Distribución",
-        ciudad: "Asunción",
-        capacidad: "12.000 pallets",
-        lat: -25.2637,
-        lng: -57.5759,
+        nombre: "Bebidas del Paraguay",
+        tipo: "Centro Logístico y Centro de Distribución",
+        ciudad: "San Antonio",
+        lat: -25.4212,
+        lng: -57.5470,
         icono: iconoCD
       },
 
       {
-        nombre: "Centro Logístico Ñemby",
+        nombre: "Pepsi",
         tipo: "Centro Logístico",
-        ciudad: "Ñemby",
-        capacidad: "8.500 pallets",
-        lat: -25.3949,
-        lng: -57.5357,
+        ciudad: "San Antonio",
+        lat: -25.4265,
+        lng: -57.5400,
         icono: iconoLogistico
       },
 
+      // MARIA AUXILIADORA
       {
-        nombre: "Cámara Fría Luque",
-        tipo: "Cámara Fría",
-        ciudad: "Luque",
-        capacidad: "2.000 pallets",
-        lat: -25.2673,
-        lng: -57.4900,
-        icono: iconoFrio
+        nombre: "Centro de Distribución",
+        tipo: "Centro de Distribución",
+        ciudad: "María Auxiliadora",
+        lat: -26.8877,
+        lng: -55.2263,
+        icono: iconoCD
+      },
+
+      // KATUETE
+      {
+        nombre: "Centro de Distribución",
+        tipo: "Centro de Distribución",
+        ciudad: "Katueté",
+        lat: -24.1455,
+        lng: -54.7594,
+        icono: iconoCD
+      },
+
+      // LIBERACION
+      {
+        nombre: "Centro de Distribución",
+        tipo: "Centro de Distribución",
+        ciudad: "Liberación",
+        lat: -24.3998,
+        lng: -56.6472,
+        icono: iconoCD
+      },
+
+      // MISIONES
+      {
+        nombre: "Centro de Distribución",
+        tipo: "Centro de Distribución",
+        ciudad: "Misiones",
+        lat: -26.8766,
+        lng: -56.8496,
+        icono: iconoCD
+      },
+
+      // ENCARNACION
+      {
+        nombre: "Centro Logístico y Centro de Distribución",
+        tipo: "Centro Logístico y Centro de Distribución",
+        ciudad: "Encarnación",
+        lat: -27.3306,
+        lng: -55.8667,
+        icono: iconoLogistico
+      },
+
+      // CORONEL OVIEDO
+      {
+        nombre: "Centro Logístico y Centro de Distribución",
+        tipo: "Centro Logístico y Centro de Distribución",
+        ciudad: "Coronel Oviedo",
+        lat: -25.4444,
+        lng: -56.4403,
+        icono: iconoLogistico
+      },
+
+      // CIUDAD DEL ESTE
+      {
+        nombre: "Centro Logístico y Centro de Distribución",
+        tipo: "Centro Logístico y Centro de Distribución",
+        ciudad: "Ciudad del Este",
+        lat: -25.5167,
+        lng: -54.6167,
+        icono: iconoLogistico
       }
 
     ];
 
     // =========================
-    // AGREGAR MARCADORES
+    // MARCADORES
     // =========================
 
     ubicaciones.forEach(punto => {
@@ -166,13 +235,12 @@
 
       marker.bindPopup(`
         <div class="popup-title">
-          ${punto.nombre}
+          ${punto.ciudad}
         </div>
 
         <div class="popup-info">
-          <b>Tipo:</b> ${punto.tipo}<br>
-          <b>Ciudad:</b> ${punto.ciudad}<br>
-          <b>Capacidad:</b> ${punto.capacidad}
+          <b>Ubicación:</b> ${punto.nombre}<br>
+          <b>Tipo:</b> ${punto.tipo}
         </div>
       `);
 
@@ -191,9 +259,15 @@
       div.innerHTML = `
         <h4>Leyenda</h4>
 
-        <div><span style="color:#007bff;">⬤</span> Centro Distribución</div>
-        <div><span style="color:#28a745;">⬤</span> Centro Logístico</div>
-        <div><span style="color:#00c2ff;">⬤</span> Cámara Fría</div>
+        <div>
+          <span style="color:#007bff;">⬤</span>
+          Centro de Distribución
+        </div>
+
+        <div>
+          <span style="color:#28a745;">⬤</span>
+          Centro Logístico
+        </div>
       `;
 
       return div;
