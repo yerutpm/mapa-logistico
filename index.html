@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mapa Logístico Paraguay</title>
+
+  <!-- Leaflet -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body{
+      background:#f4f4f4;
+    }
+
+    .header{
+      background:#003366;
+      color:white;
+      padding:15px 20px;
+      font-size:22px;
+      font-weight:bold;
+      box-shadow:0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    #map{
+      width:100%;
+      height:90vh;
+    }
+
+    .popup-title{
+      font-size:18px;
+      font-weight:bold;
+      margin-bottom:8px;
+      color:#003366;
+    }
+
+    .popup-info{
+      font-size:14px;
+      line-height:1.5;
+    }
+
+    .legend {
+      background: white;
+      padding: 12px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      line-height: 1.8;
+    }
+
+    .legend h4{
+      margin-bottom:8px;
+      color:#003366;
+    }
+
+    .legend span{
+      font-size:18px;
+      margin-right:8px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    Mapa de Centros Logísticos - Paraguay
+  </div>
+
+  <div id="map"></div>
+
+  <script>
+
+    // =========================
+    // CREAR MAPA
+    // =========================
+
+    const map = L.map('map').setView([-23.4425, -58.4438], 6);
+
+    // MAPA BASE
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
+
+    // =========================
+    // ICONOS PERSONALIZADOS
+    // =========================
+
+    function crearIcono(color) {
+      return L.divIcon({
+        html: `
+          <div style="
+            background:${color};
+            width:22px;
+            height:22px;
+            border-radius:50%;
+            border:3px solid white;
+            box-shadow:0 0 10px rgba(0,0,0,0.4);
+          "></div>
+        `,
+        className: "",
+        iconSize: [22,22]
+      });
+    }
+
+    const iconoCD = crearIcono("#007bff");
+    const iconoLogistico = crearIcono("#28a745");
+    const iconoFrio = crearIcono("#00c2ff");
+
+    // =========================
+    // UBICACIONES
+    // =========================
+
+    const ubicaciones = [
+
+      {
+        nombre: "CD Asunción",
+        tipo: "Centro de Distribución",
+        ciudad: "Asunción",
+        capacidad: "12.000 pallets",
+        lat: -25.2637,
+        lng: -57.5759,
+        icono: iconoCD
+      },
+
+      {
+        nombre: "Centro Logístico Ñemby",
+        tipo: "Centro Logístico",
+        ciudad: "Ñemby",
+        capacidad: "8.500 pallets",
+        lat: -25.3949,
+        lng: -57.5357,
+        icono: iconoLogistico
+      },
+
+      {
+        nombre: "Cámara Fría Luque",
+        tipo: "Cámara Fría",
+        ciudad: "Luque",
+        capacidad: "2.000 pallets",
+        lat: -25.2673,
+        lng: -57.4900,
+        icono: iconoFrio
+      }
+
+    ];
+
+    // =========================
+    // AGREGAR MARCADORES
+    // =========================
+
+    ubicaciones.forEach(punto => {
+
+      const marker = L.marker([punto.lat, punto.lng], {
+        icon: punto.icono
+      }).addTo(map);
+
+      marker.bindPopup(`
+        <div class="popup-title">
+          ${punto.nombre}
+        </div>
+
+        <div class="popup-info">
+          <b>Tipo:</b> ${punto.tipo}<br>
+          <b>Ciudad:</b> ${punto.ciudad}<br>
+          <b>Capacidad:</b> ${punto.capacidad}
+        </div>
+      `);
+
+    });
+
+    // =========================
+    // LEYENDA
+    // =========================
+
+    const legend = L.control({ position: "bottomright" });
+
+    legend.onAdd = function () {
+
+      const div = L.DomUtil.create("div", "legend");
+
+      div.innerHTML = `
+        <h4>Leyenda</h4>
+
+        <div><span style="color:#007bff;">⬤</span> Centro Distribución</div>
+        <div><span style="color:#28a745;">⬤</span> Centro Logístico</div>
+        <div><span style="color:#00c2ff;">⬤</span> Cámara Fría</div>
+      `;
+
+      return div;
+    };
+
+    legend.addTo(map);
+
+  </script>
+
+</body>
+</html>
